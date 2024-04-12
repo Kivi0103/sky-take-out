@@ -1,7 +1,11 @@
 package com.sky.service.impl;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
@@ -9,15 +13,23 @@ import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
+
+    @Autowired
+    private HttpServletRequest request;
 
     /**
      * 员工登录
@@ -53,6 +65,35 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //3、返回实体对象
         return employee;
+    }
+
+    /**
+     * 新增员工
+     * @param employeeDTO
+     */
+    @Override
+    public void save(EmployeeDTO employeeDTO) {
+        // 使用BeanUtils.copyProperties()方法将DTO对象转换成实体对象
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 设置状态，1表示启用，0表示禁用，使用常量类StatusConstant的属性
+        employee.setStatus(StatusConstant.ENABLE);
+
+        // 设置创建时间和更新时间
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        // 设置密码,密码使用默认密码并用md5加密，
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+
+        // 设置更新人的信息
+        // 通过BaseContext获取当前登录的用户信息
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        // 调用mapper的save()方法保存员工信息
+        employeeMapper.save(employee);
     }
 
 }
