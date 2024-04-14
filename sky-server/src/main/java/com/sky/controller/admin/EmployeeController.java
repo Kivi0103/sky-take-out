@@ -95,10 +95,45 @@ public class EmployeeController {
      */
     @GetMapping("/page")
     @ApiOperation("员工分页查询")
-    public Result pageQuery(EmployeePageQueryDTO employeePageQueryDTO){// 此处不需要加@RequestBody，因为是get请求，参数直接在url中传递，可以自动绑定
+    public Result<PageResult> pageQuery(EmployeePageQueryDTO employeePageQueryDTO){// 此处不需要加@RequestBody，因为是get请求，参数直接在url中传递，可以自动绑定
         // 默认起始页码为1
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 启用或禁用员工
+     * @param id
+     * @param status
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用或禁用员工")
+    public Result startOrStop(Long id, @PathVariable Integer status) {
+        log.info("启用或禁用员工：id={}, status={}", id, status);
+        employeeService.startOrStop(id, status);
+        return Result.success();
+    }
+
+    /**
+     * 根据id查询员工
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询员工")
+    public Result<Employee> getById(@PathVariable Long id) {
+        log.info("根据id查询员工：{}", id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    @PutMapping
+    @ApiOperation("更新员工信息")
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("更新员工信息：{}", employeeDTO);
+        employeeService.update(employeeDTO);
+        return Result.success();
     }
 
 }
