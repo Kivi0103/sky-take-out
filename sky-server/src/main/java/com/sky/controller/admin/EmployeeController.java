@@ -26,7 +26,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/employee")
 @Slf4j
-@Api(tags = "员工登录")  // Swagger API注解，用于生成接口文档中的接口描述
+@Api(tags = "员工管理")  // Swagger API注解，用于生成接口文档中的接口描述
 public class EmployeeController {
 
     @Autowired
