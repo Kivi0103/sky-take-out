@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Api(tags = "用户端查询店铺管理")
+@Api(tags = "C端查询店铺管理")
 @RequestMapping("/user/shop")
 @Slf4j
 public class UserShopController {
@@ -20,8 +20,8 @@ public class UserShopController {
     @GetMapping("/status")
     @ApiOperation("获取店铺营业状态")
     public Result<Integer> getShopStatus() {
-        Integer shopStatus = (Integer) redisTemplate.opsForValue().get("shop_status");
-        log.info("获取店铺营业状态为:", shopStatus==1? "营业中" : "打烊中" );
+        Integer shopStatus = (Integer) redisTemplate.opsForValue().get("SHOP_STATUS");
+        log.info("获取店铺营业状态为:{}", shopStatus==1? "营业中" : "打烊中" );
         return Result.success(shopStatus);
     }
 }

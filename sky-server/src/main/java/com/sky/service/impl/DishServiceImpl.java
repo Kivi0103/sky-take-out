@@ -157,4 +157,25 @@ public class DishServiceImpl implements DishService {
         dish.setId(id);
         dishMapper.updateDish(dish);
     }
+
+    @Override
+    public List<Dish> listDishByCategoryId(Long categoryId) {
+        List<Dish> dishList = dishMapper.selectByCategoryId(categoryId);
+
+        return dishList;
+    }
+
+    @Override
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+        List<DishVO> dishVOList = new ArrayList<>();
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d, dishVO);
+            List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(d.getId());
+            dishVO.setFlavors(dishFlavors);
+            dishVOList.add(dishVO);
+        }
+        return dishVOList;
+    }
 }
