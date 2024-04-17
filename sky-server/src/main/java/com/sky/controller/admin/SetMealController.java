@@ -11,6 +11,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +46,7 @@ public class SetMealController {
      */
     @PostMapping
     @ApiOperation("新增套餐")
+    @CacheEvict(value = "setmealCache", key = "#setmealDTO.categoryId")
     public Result add(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐，setmealDTO={}", setmealDTO);
         setMealService.add(setmealDTO);
@@ -71,6 +74,7 @@ public class SetMealController {
      */
     @PutMapping
     @ApiOperation("修改套餐")
+    @CacheEvict(value = "setmealCache", allEntries = true)// 因为可能修改分类id，那么如果不清理所有缓存数据的话，其他分类id得缓存数据中就不会有修改之后的这个套餐信息了
     public Result update(@RequestBody SetmealDTO setmealDTO) {
         log.info("controller层...修改套餐，setmealDTO={}", setmealDTO);
         setMealService.update(setmealDTO);
@@ -85,6 +89,7 @@ public class SetMealController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation("修改套餐状态")
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result modifyStatus(@PathVariable Integer status, @RequestParam Long id) {
         log.info("controller层...修改套餐状态，status={},id={}", status, id);
         setMealService.modifyStatus(status, id);
@@ -93,6 +98,7 @@ public class SetMealController {
 
     @DeleteMapping
     @ApiOperation("删除套餐")
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result delete(@RequestParam List<Long> ids){
         log.info("controller层...删除套餐，ids={}", ids);
         setMealService.delete(ids);
